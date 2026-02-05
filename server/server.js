@@ -10,11 +10,30 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// CORS configuration
+// CORS configuration - support multiple origins
+const getAllowedOrigins = () => {
+  if (process.env.NODE_ENV !== 'production') {
+    return ['http://localhost:5173'];
+  }
+
+  // Support comma-separated list of URLs in production
+  const frontendUrl = process.env.FRONTEND_URL || '';
+  return frontendUrl.split(',').map(url => url.trim()).filter(Boolean);
+};
+
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production'
-    ? process.env.FRONTEND_URL
-    : 'http://localhost:5173',
+  origin: (origin, callback) => {
+    const allowedOrigins = getAllowedOrigins();
+
+    // Allow requests with no origin (mobile apps, Postman, etc.)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   optionsSuccessStatus: 200
 };
