@@ -1,0 +1,173 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base styles */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: #FEFEFE;
+  color: #1A1A1A;
+}
+
+/* RSVP Button Animation */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 4px 20px rgba(139, 90, 43, 0.4);
+  }
+  50% {
+    box-shadow: 0 4px 30px rgba(139, 90, 43, 0.6);
+  }
+}
+
+.rsvp-button {
+  @apply bg-accent text-white py-4 px-12 text-lg tracking-widest uppercase font-medium;
+  @apply transition-all duration-300 hover:bg-accent-hover;
+  animation: pulse-glow 2s infinite;
+}
+
+.rsvp-button:hover {
+  animation: none;
+  box-shadow: 0 6px 25px rgba(139, 90, 43, 0.5);
+}
+
+/* Floating button animation */
+.floating-rsvp {
+  @apply fixed bottom-6 right-6 z-50;
+  @apply bg-accent text-white py-3 px-6 rounded-full shadow-lg;
+  @apply transition-all duration-300 hover:bg-accent-hover hover:scale-105;
+  animation: pulse-glow 2s infinite;
+}
+
+.floating-rsvp:hover {
+  animation: none;
+}
+
+/* Modal overlay */
+.modal-overlay {
+  @apply fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+  @apply bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Section styling */
+.section {
+  @apply py-16 md:py-24 px-4;
+}
+
+.section-title {
+  @apply font-serif text-3xl md:text-4xl text-center mb-8;
+}
+
+/* Card styling */
+.info-card {
+  @apply bg-white rounded-lg shadow-md p-6 md:p-8;
+}
+
+/* Form inputs */
+.form-input {
+  @apply w-full px-4 py-2 border border-gray-300 rounded-md;
+  @apply focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent;
+  @apply transition-all duration-200;
+}
+
+.form-label {
+  @apply block text-sm font-medium text-text-secondary mb-1;
+}
+
+/* Button base */
+.btn {
+  @apply px-6 py-2 rounded-md font-medium transition-all duration-200;
+  @apply focus:outline-none focus:ring-2 focus:ring-offset-2;
+}
+
+.btn-primary {
+  @apply bg-accent text-white hover:bg-accent-hover focus:ring-accent;
+}
+
+.btn-secondary {
+  @apply bg-gray-200 text-text-primary hover:bg-gray-300 focus:ring-gray-400;
+}
+
+.btn-danger {
+  @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+}
+
+/* Copy button feedback */
+.copy-success {
+  @apply text-green-600;
+}
+
+/* Countdown timer */
+.countdown-item {
+  @apply text-center;
+}
+
+.countdown-value {
+  @apply font-serif text-4xl md:text-6xl text-white;
+}
+
+.countdown-label {
+  @apply text-sm md:text-base text-white/80 uppercase tracking-wider;
+}
+
+/* Language switcher */
+.lang-btn {
+  @apply px-3 py-1 text-sm rounded transition-colors duration-200;
+}
+
+.lang-btn.active {
+  @apply bg-accent text-white;
+}
+
+.lang-btn:not(.active) {
+  @apply text-text-secondary hover:text-text-primary hover:bg-gray-100;
+}
+
+/* Admin styles */
+.admin-card {
+  @apply bg-white rounded-lg shadow-md p-6;
+}
+
+.admin-stat {
+  @apply text-3xl font-bold text-accent;
+}
+
+.admin-table {
+  @apply w-full text-left;
+}
+
+.admin-table th {
+  @apply px-4 py-3 bg-gray-50 font-medium text-text-secondary text-sm uppercase tracking-wider;
+}
+
+.admin-table td {
+  @apply px-4 py-3 border-t border-gray-100;
+}
+
+.admin-table tr:hover td {
+  @apply bg-gray-50;
+}

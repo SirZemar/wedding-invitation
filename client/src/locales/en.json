@@ -1,0 +1,125 @@
+{
+  "hero": {
+    "weAreGettingMarried": "We're Getting Married!",
+    "saveTheDate": "Save the Date",
+    "rsvpButton": "RSVP"
+  },
+  "countdown": {
+    "days": "Days",
+    "hours": "Hours",
+    "minutes": "Minutes",
+    "seconds": "Seconds"
+  },
+  "ceremony": {
+    "title": "Ceremony",
+    "church": "Church",
+    "date": "Date",
+    "time": "Time",
+    "viewMap": "View on Map",
+    "addToCalendar": "Add to Calendar"
+  },
+  "venue": {
+    "title": "Celebration",
+    "location": "Location",
+    "time": "Time",
+    "viewMap": "View on Map",
+    "addToCalendar": "Add to Calendar"
+  },
+  "rsvp": {
+    "title": "RSVP",
+    "subtitle": "Please confirm your attendance by",
+    "deadline": "[RSVP_DEADLINE]",
+    "guestName": "Guest Name",
+    "guestNamePlaceholder": "Enter full name",
+    "attending": "Will you attend?",
+    "yes": "Yes, I'll be there",
+    "no": "Sorry, I can't make it",
+    "plusOne": "I'd like to bring a plus one",
+    "addGuest": "Add another guest",
+    "removeGuest": "Remove",
+    "notes": "Additional notes",
+    "notesPlaceholder": "Dietary restrictions, message for the couple...",
+    "submit": "Submit RSVP",
+    "submitting": "Submitting...",
+    "success": "Thank you for your response!",
+    "successMessage": "Your RSVP has been recorded successfully.",
+    "error": "An error occurred. Please try again.",
+    "close": "Close"
+  },
+  "gifts": {
+    "title": "Gifts",
+    "message": "The most important thing is that you share this special moment with us. If you’d like to give a gift, we’d be grateful for any contribution to help us build our life together.",
+    "bankDetails": "Bank Details",
+    "accountHolder": "Account Holder",
+    "iban": "IBAN",
+    "bank": "Bank",
+    "copyIban": "Copy IBAN",
+    "copied": "Copied!"
+  },
+  "nav": {
+    "ceremony": "Ceremony",
+    "celebration": "Celebration",
+    "transportation": "Transportation",
+    "accommodation": "Accommodation",
+    "gifts": "Gifts"
+  },
+  "transportation": {
+    "title": "Transportation",
+    "byPublicTransport": "By Public Transport (Metro)",
+    "byPublicTransportDescription": "Metro Line F (orange line) to Rio Tinto station. From there, it's a 15-minute wal (750m). If you come from downtown you can take the yellow line (Line D) to Trindade and change to the orange line (Line F). Last metro to depart from Rio Tinto is around 00:45 AM. Make sure to be there before.",
+    "byPublicTransportDescriptionImportant": "Important:",
+    "byPublicTransportDescriptionNote": "Buy an Andante card at the metro station machines (€0.60) and charge it with Z3 (€1.85) to travel from downtown Porto to Rio Tinto. Validate it once at the start of your trip and each time you change lines. The ticket is valid for 1 hour, and each person must have their own Andante card with the correct trip.",
+    "byTaxi": "By Uber / Bolt",
+    "byTaxiDescription": "Services like Uber or Bolt are readily available throughout Porto. The journey from the city center takes approximately 20 minutes. They are easily available during the night next to the venue. Prices range from 5€ to 10€.",
+    "parking": "Parking Information",
+    "parkingDescription": "Free parking is available for all guests. The parking area is located inside the venue."
+  },
+  "accommodation": {
+    "title": "Accommodation",
+    "subtitle": "We recommend these hotels near the venue for your convenience:",
+    "featuredTitle": "Featured Accommodation",
+    "apartmentsName": "Oporto City View",
+    "apartmentsDescription": "This is our recommendation, and thanks to our close relationship with the hosts, we’re happy to assist with bookings or any questions.",
+    "viewWebsite": "View Website",
+    "hotel1Name": "Hotel Example 1",
+    "hotel1Distance": "2 km from venue",
+    "hotel1Description": "Modern hotel with comfortable rooms and excellent amenities. Complimentary breakfast included.",
+    "hotel2Name": "Hotel Example 2",
+    "hotel2Distance": "3 km from venue",
+    "hotel2Description": "Boutique hotel with charming décor and personalized service. Perfect for a relaxing stay.",
+    "hotel3Name": "Hotel Example 3",
+    "hotel3Distance": "5 km from venue",
+    "hotel3Description": "Family-friendly hotel with spacious rooms and free parking. Great value for money.",
+    "viewDetails": "View Details",
+    "additionalInfo": "We recommend booking your accommodation early, as September is still peak season in Porto. If you’d like recommendations or need help with your booking, we’re more than happy to help.",
+    "apartmentsContactWA": "Contact via WhatsApp",
+    "apartmentsContact": "Contact"
+  },
+  "footer": {
+    "madeWithLove": "Made with love",
+    "by": "by"
+  },
+  "admin": {
+    "title": "Admin Dashboard",
+    "login": "Login",
+    "password": "Password",
+    "passwordPlaceholder": "Enter password",
+    "logout": "Logout",
+    "stats": "Statistics",
+    "totalSubmissions": "Total Submissions",
+    "totalGuests": "Total Guests",
+    "attending": "Attending",
+    "notAttending": "Not Attending",
+    "plusOneRequests": "Plus One Requests",
+    "recentSubmissions": "Recent Submissions",
+    "allSubmissions": "All Submissions",
+    "exportCsv": "Export CSV",
+    "delete": "Delete",
+    "confirmDelete": "Are you sure you want to delete this submission?",
+    "noSubmissions": "No submissions yet.",
+    "date": "Date",
+    "guests": "Guests",
+    "language": "Language",
+    "notes": "Notes"
+  }
+}
