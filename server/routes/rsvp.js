@@ -1,11 +1,13 @@
 import { Router } from 'express';
-import db from '../db/init.js';
+import pool from '../db/init.js';
 import { authMiddleware } from '../middleware/auth.js';
 
 const router = Router();
 
 // Create a new RSVP submission
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
+  const client = await pool.connect();
+
   try {
     const { guests, notes, language } = req.body;
 
@@ -28,35 +30,25 @@ router.post('/', (req, res) => {
       }
     }
 
-    // Insert submission
-    const insertSubmission = db.prepare(`
-      INSERT INTO submissions (language, notes)
-      VALUES (?, ?)
-    `);
-
-    const insertGuest = db.prepare(`
-      INSERT INTO guests (submission_id, name, attending, is_plus_one_request)
-      VALUES (?, ?, ?, ?)
-    `);
-
     // Use transaction for data integrity
-    const createSubmission = db.transaction((guests, notes, language) => {
-      const result = insertSubmission.run(language, notes || null);
-      const submissionId = result.lastInsertRowid;
+    await client.query('BEGIN');
 
-      for (const guest of guests) {
-        insertGuest.run(
-          submissionId,
-          guest.name.trim(),
-          guest.attending ? 1 : 0,
-          guest.isPlusOneRequest ? 1 : 0
-        );
-      }
+    // Insert submission
+    const submissionResult = await client.query(
+      'INSERT INTO submissions (language, notes) VALUES ($1, $2) RETURNING id',
+      [language, notes || null]
+    );
+    const submissionId = submissionResult.rows[0].id;
 
-      return submissionId;
-    });
+    // Insert guests
+    for (const guest of guests) {
+      await client.query(
+        'INSERT INTO guests (submission_id, name, attending, is_plus_one_request) VALUES ($1, $2, $3, $4)',
+        [submissionId, guest.name.trim(), guest.attending, guest.isPlusOneRequest || false]
+      );
+    }
 
-    const submissionId = createSubmission(guests, notes, language);
+    await client.query('COMMIT');
 
     res.status(201).json({
       success: true,
@@ -64,42 +56,43 @@ router.post('/', (req, res) => {
       message: 'RSVP submitted successfully'
     });
   } catch (error) {
+    await client.query('ROLLBACK');
     console.error('Error creating RSVP:', error);
     res.status(500).json({ error: 'Failed to submit RSVP' });
+  } finally {
+    client.release();
   }
 });
 
 // Get all submissions (admin only)
-router.get('/', authMiddleware, (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
   try {
-    const submissions = db.prepare(`
+    const result = await pool.query(`
       SELECT
         s.id,
         s.created_at,
         s.language,
         s.notes,
-        json_group_array(
-          json_object(
-            'id', g.id,
-            'name', g.name,
-            'attending', g.attending,
-            'isPlusOneRequest', g.is_plus_one_request,
-            'plusOneStatus', g.plus_one_status
-          )
+        COALESCE(
+          json_agg(
+            json_build_object(
+              'id', g.id,
+              'name', g.name,
+              'attending', g.attending,
+              'isPlusOneRequest', g.is_plus_one_request,
+              'plusOneStatus', g.plus_one_status
+            )
+            ORDER BY g.id
+          ) FILTER (WHERE g.id IS NOT NULL),
+          '[]'
         ) as guests
       FROM submissions s
       LEFT JOIN guests g ON g.submission_id = s.id
       GROUP BY s.id
       ORDER BY s.created_at DESC
-    `).all();
+    `);
 
-    // Parse the JSON guests string
-    const result = submissions.map(s => ({
-      ...s,
-      guests: JSON.parse(s.guests)
-    }));
-
-    res.json(result);
+    res.json(result.rows);
   } catch (error) {
     console.error('Error fetching submissions:', error);
     res.status(500).json({ error: 'Failed to fetch submissions' });
@@ -107,14 +100,17 @@ router.get('/', authMiddleware, (req, res) => {
 });
 
 // Update submission notes (admin only)
-router.patch('/:id', authMiddleware, (req, res) => {
+router.patch('/:id', authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
     const { notes } = req.body;
 
-    const result = db.prepare('UPDATE submissions SET notes = ? WHERE id = ?').run(notes, id);
+    const result = await pool.query(
+      'UPDATE submissions SET notes = $1 WHERE id = $2',
+      [notes, id]
+    );
 
-    if (result.changes === 0) {
+    if (result.rowCount === 0) {
       return res.status(404).json({ error: 'Submission not found' });
     }
 
@@ -126,7 +122,7 @@ router.patch('/:id', authMiddleware, (req, res) => {
 });
 
 // Update guest plus one status (admin only)
-router.patch('/:submissionId/guest/:guestId', authMiddleware, (req, res) => {
+router.patch('/:submissionId/guest/:guestId', authMiddleware, async (req, res) => {
   try {
     const { submissionId, guestId } = req.params;
     const { plusOneStatus } = req.body;
@@ -136,13 +132,12 @@ router.patch('/:submissionId/guest/:guestId', authMiddleware, (req, res) => {
       return res.status(400).json({ error: 'Invalid status. Must be "approved", "rejected", or null' });
     }
 
-    const result = db.prepare(`
-      UPDATE guests
-      SET plus_one_status = ?
-      WHERE id = ? AND submission_id = ?
-    `).run(plusOneStatus, guestId, submissionId);
+    const result = await pool.query(
+      'UPDATE guests SET plus_one_status = $1 WHERE id = $2 AND submission_id = $3',
+      [plusOneStatus, guestId, submissionId]
+    );
 
-    if (result.changes === 0) {
+    if (result.rowCount === 0) {
       return res.status(404).json({ error: 'Guest not found' });
     }
 
@@ -154,13 +149,13 @@ router.patch('/:submissionId/guest/:guestId', authMiddleware, (req, res) => {
 });
 
 // Delete a submission (admin only)
-router.delete('/:id', authMiddleware, (req, res) => {
+router.delete('/:id', authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
 
-    const result = db.prepare('DELETE FROM submissions WHERE id = ?').run(id);
+    const result = await pool.query('DELETE FROM submissions WHERE id = $1', [id]);
 
-    if (result.changes === 0) {
+    if (result.rowCount === 0) {
       return res.status(404).json({ error: 'Submission not found' });
     }
 

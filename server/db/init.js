@@ -1,53 +1,63 @@
-import Database from 'better-sqlite3';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import fs from 'fs';
+import pg from 'pg';
+const { Pool } = pg;
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+// Create PostgreSQL connection pool
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+});
 
-const dbPath = process.env.DB_PATH || path.join(__dirname, 'wedding.db');
-
-// Ensure the directory exists before creating the database
-const dbDir = path.dirname(dbPath);
-if (!fs.existsSync(dbDir)) {
-  fs.mkdirSync(dbDir, { recursive: true });
-  console.log(`Created database directory: ${dbDir}`);
-}
-
-const db = new Database(dbPath);
-
-// Enable foreign keys
-db.pragma('foreign_keys = ON');
+// Test connection
+pool.query('SELECT NOW()', (err, res) => {
+  if (err) {
+    console.error('Database connection error:', err);
+  } else {
+    console.log('Database connected successfully:', res.rows[0]);
+  }
+});
 
 // Initialize tables
-db.exec(`
-  -- Submissions table (one per RSVP submission)
-  CREATE TABLE IF NOT EXISTS submissions (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    language TEXT NOT NULL,
-    notes TEXT
-  );
+const initDatabase = async () => {
+  const client = await pool.connect();
 
-  -- Guests table (linked to submissions)
-  CREATE TABLE IF NOT EXISTS guests (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    submission_id INTEGER NOT NULL,
-    name TEXT NOT NULL,
-    attending BOOLEAN NOT NULL,
-    is_plus_one_request BOOLEAN DEFAULT 0,
-    plus_one_status TEXT DEFAULT NULL,
-    FOREIGN KEY (submission_id) REFERENCES submissions(id) ON DELETE CASCADE
-  );
-`);
+  try {
+    await client.query('BEGIN');
 
-// Migration: Add plus_one_status column if it doesn't exist
-try {
-  db.exec(`ALTER TABLE guests ADD COLUMN plus_one_status TEXT DEFAULT NULL`);
-} catch (e) {
-  // Column already exists, ignore
-}
+    // Create submissions table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS submissions (
+        id SERIAL PRIMARY KEY,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        language TEXT NOT NULL,
+        notes TEXT
+      );
+    `);
 
-console.log('Database initialized successfully');
+    // Create guests table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS guests (
+        id SERIAL PRIMARY KEY,
+        submission_id INTEGER NOT NULL REFERENCES submissions(id) ON DELETE CASCADE,
+        name TEXT NOT NULL,
+        attending BOOLEAN NOT NULL,
+        is_plus_one_request BOOLEAN DEFAULT FALSE,
+        plus_one_status TEXT DEFAULT NULL
+      );
+    `);
 
-export default db;
+    await client.query('COMMIT');
+    console.log('Database tables initialized successfully');
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.error('Error initializing database:', error);
+    throw error;
+  } finally {
+    client.release();
+  }
+};
+
+// Initialize database on startup
+initDatabase().catch(console.error);
+
+// Export pool for queries
+export default pool;

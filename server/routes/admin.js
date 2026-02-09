@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import db from '../db/init.js';
+import pool from '../db/init.js';
 import { generateToken, authMiddleware } from '../middleware/auth.js';
 
 const router = Router();
@@ -30,45 +30,63 @@ router.post('/login', (req, res) => {
 });
 
 // Get dashboard statistics (admin only)
-router.get('/stats', authMiddleware, (req, res) => {
+router.get('/stats', authMiddleware, async (req, res) => {
   try {
     // Total submissions
-    const totalSubmissions = db.prepare('SELECT COUNT(*) as count FROM submissions').get().count;
+    const totalSubmissionsResult = await pool.query('SELECT COUNT(*) as count FROM submissions');
+    const totalSubmissions = parseInt(totalSubmissionsResult.rows[0].count);
 
     // Total guests
-    const totalGuests = db.prepare('SELECT COUNT(*) as count FROM guests').get().count;
+    const totalGuestsResult = await pool.query('SELECT COUNT(*) as count FROM guests');
+    const totalGuests = parseInt(totalGuestsResult.rows[0].count);
 
     // Attending guests (excluding plus ones)
-    const attendingGuests = db.prepare('SELECT COUNT(*) as count FROM guests WHERE attending = 1').get().count;
+    const attendingGuestsResult = await pool.query('SELECT COUNT(*) as count FROM guests WHERE attending = true');
+    const attendingGuests = parseInt(attendingGuestsResult.rows[0].count);
 
     // Approved plus ones
-    const approvedPlusOnes = db.prepare('SELECT COUNT(*) as count FROM guests WHERE is_plus_one_request = 1 AND attending = 1 AND plus_one_status = ?').get('approved').count;
+    const approvedPlusOnesResult = await pool.query(
+      'SELECT COUNT(*) as count FROM guests WHERE is_plus_one_request = true AND attending = true AND plus_one_status = $1',
+      ['approved']
+    );
+    const approvedPlusOnes = parseInt(approvedPlusOnesResult.rows[0].count);
 
     // Not attending guests
-    const notAttendingGuests = db.prepare('SELECT COUNT(*) as count FROM guests WHERE attending = 0').get().count;
+    const notAttendingGuestsResult = await pool.query('SELECT COUNT(*) as count FROM guests WHERE attending = false');
+    const notAttendingGuests = parseInt(notAttendingGuestsResult.rows[0].count);
 
     // Plus one requests (total)
-    const plusOneRequests = db.prepare('SELECT COUNT(*) as count FROM guests WHERE is_plus_one_request = 1 AND attending = 1').get().count;
+    const plusOneRequestsResult = await pool.query('SELECT COUNT(*) as count FROM guests WHERE is_plus_one_request = true AND attending = true');
+    const plusOneRequests = parseInt(plusOneRequestsResult.rows[0].count);
 
     // Submissions by language
-    const byLanguage = db.prepare(`
+    const byLanguageResult = await pool.query(`
       SELECT language, COUNT(*) as count
       FROM submissions
       GROUP BY language
-    `).all();
+    `);
+    const byLanguage = byLanguageResult.rows.map(row => ({
+      language: row.language,
+      count: parseInt(row.count)
+    }));
 
     // Recent submissions (last 5)
-    const recentSubmissions = db.prepare(`
+    const recentSubmissionsResult = await pool.query(`
       SELECT
         s.id,
         s.created_at,
         s.language,
         (SELECT COUNT(*) FROM guests WHERE submission_id = s.id) as guest_count,
-        (SELECT COUNT(*) FROM guests WHERE submission_id = s.id AND attending = 1) as attending_count
+        (SELECT COUNT(*) FROM guests WHERE submission_id = s.id AND attending = true) as attending_count
       FROM submissions s
       ORDER BY s.created_at DESC
       LIMIT 5
-    `).all();
+    `);
+    const recentSubmissions = recentSubmissionsResult.rows.map(row => ({
+      ...row,
+      guest_count: parseInt(row.guest_count),
+      attending_count: parseInt(row.attending_count)
+    }));
 
     res.json({
       totalSubmissions,
@@ -87,9 +105,9 @@ router.get('/stats', authMiddleware, (req, res) => {
 });
 
 // Export CSV (admin only)
-router.get('/export', authMiddleware, (req, res) => {
+router.get('/export', authMiddleware, async (req, res) => {
   try {
-    const data = db.prepare(`
+    const result = await pool.query(`
       SELECT
         s.id as submission_id,
         s.created_at,
@@ -102,7 +120,9 @@ router.get('/export', authMiddleware, (req, res) => {
       FROM submissions s
       LEFT JOIN guests g ON g.submission_id = s.id
       ORDER BY s.created_at DESC, g.id
-    `).all();
+    `);
+
+    const data = result.rows;
 
     // Build CSV
     const headers = ['Submission ID', 'Date', 'Language', 'Notes', 'Guest Name', 'Attending', 'Plus One Request', 'Plus One Status'];
