@@ -12,6 +12,7 @@
   },
   "ceremony": {
     "title": "Cerimónia",
+    "introduction": "Junta-te a nós quando trocarmos os nossos votos numa bela cerimónia rodeados de família e amigos.",
     "church": "Igreja",
     "date": "Data",
     "time": "Hora",
@@ -20,6 +21,7 @@
   },
   "venue": {
     "title": "Celebração",
+    "introduction": "Após a cerimónia, convidamo-te a celebrar connosco numa festa cheia de comida, bebidas, música e dança!",
     "location": "Local",
     "time": "Hora",
     "viewMap": "Ver no Mapa",
@@ -54,6 +56,9 @@
     "iban": "IBAN",
     "bank": "Banco",
     "copyIban": "Copiar IBAN",
+    "mbway": "MBWAY",
+    "phoneNumber": "Número de Telemóvel",
+    "copyPhone": "Copiar Número",
     "copied": "Copiado!"
   },
   "nav": {
@@ -96,6 +101,9 @@
     "viewWebsite": "Ver Website",
     "apartmentsContactWA": "Contactar via WhatsApp",
     "apartmentsContact": "Contacto"
+  },
+  "outro": {
+    "message": "Estamos muito entusiasmados por celebrar o nosso amor contigo e mal podemos esperar para te ver 💓"
   },
   "footer": {
     "madeWithLove": "Feito com amor",

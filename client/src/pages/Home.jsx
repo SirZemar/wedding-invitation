@@ -7,6 +7,7 @@ import VenueSection from '@/components/sections/venue/VenueSection'
 import TransportationSection from '@/components/sections/transportation/TransportationSection'
 import AccommodationSection from '@/components/sections/accommodation/AccommodationSection'
 import GiftSection from '@/components/sections/gifts/GiftSection'
+import OutroSection from '@/components/sections/OutroSection'
 import RSVPModal from '@/components/rsvp/RSVPModal'
 import FloatingRSVP from '@/components/common/FloatingRSVP'
 
@@ -25,6 +26,7 @@ export default function Home() {
       <TransportationSection />
       <AccommodationSection />
       <GiftSection />
+      <OutroSection />
       <Footer />
 
       <FloatingRSVP onClick={openRSVP} />

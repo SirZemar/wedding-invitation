@@ -12,6 +12,10 @@ export default function VenueSection() {
       <div className="max-w-6xl mx-auto">
         <h2 className="section-title font-serif">{t('venue.title')}</h2>
 
+        <p className="text-center text-text-secondary mb-8 max-w-2xl mx-auto">
+          {t('venue.introduction')}
+        </p>
+
         <div className="grid md:grid-cols-2 gap-8 items-stretch">
           {/* Image - Left side */}
           <div className="relative rounded-lg overflow-hidden shadow-lg min-h-[400px] md:min-h-0 order-2 md:order-1">

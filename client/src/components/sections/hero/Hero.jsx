@@ -8,7 +8,14 @@ export default function Hero({ onRSVPClick }) {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      <img src={HeroImage} alt="Hero" className="absolute inset-0 w-full h-full object-cover object-center filter brightness-75" />
+      <img
+        src={HeroImage}
+        alt="Hero"
+        className="absolute inset-0 w-full h-full object-cover filter brightness-75"
+        style={{
+          objectPosition: '53% 40%'
+        }}
+      />
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{

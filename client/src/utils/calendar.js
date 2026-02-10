@@ -27,6 +27,9 @@ export const WEDDING_CONFIG = {
   iban: 'PT50 0023 0000 4575 8992 7229 4',
   bankName: 'ActivoBank',
 
+  // MBWAY
+  mbwayPhone: '+351 916 243 800',
+
   // RSVP deadline
   rsvpDeadlineISO: '2026-08-15'
 }

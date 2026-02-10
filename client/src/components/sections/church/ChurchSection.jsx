@@ -12,6 +12,10 @@ export default function ChurchSection() {
       <div className="max-w-6xl mx-auto">
         <h2 className="section-title font-serif">{t('ceremony.title')}</h2>
 
+        <p className="text-center text-text-secondary mb-8 max-w-2xl mx-auto">
+          {t('ceremony.introduction')}
+        </p>
+
         <div className="grid md:grid-cols-2 gap-8 items-stretch">
           {/* Card - Left side */}
           <div className="info-card flex flex-col">

@@ -12,6 +12,7 @@
   },
   "ceremony": {
     "title": "Ceremony",
+    "introduction": "Join us as we exchange our vows in a beautiful ceremony surrounded by family and friends.",
     "church": "Church",
     "date": "Date",
     "time": "Time",
@@ -20,6 +21,7 @@
   },
   "venue": {
     "title": "Celebration",
+    "introduction": "After the ceremony, we invite you to celebrate with us at a reception filled with food, drinks, music, and dancing!",
     "location": "Location",
     "time": "Time",
     "viewMap": "View on Map",
@@ -48,12 +50,15 @@
   },
   "gifts": {
     "title": "Gifts",
-    "message": "The most important thing is that you share this special moment with us. If you’d like to give a gift, we’d be grateful for any contribution to help us build our life together.",
+    "message": "The most important thing is that you share this special moment with us. If you'd like to give a gift, we'd be grateful for any contribution to help us build our life together.",
     "bankDetails": "Bank Details",
     "accountHolder": "Account Holder",
     "iban": "IBAN",
     "bank": "Bank",
     "copyIban": "Copy IBAN",
+    "mbway": "MBWAY",
+    "phoneNumber": "Phone Number",
+    "copyPhone": "Copy Number",
     "copied": "Copied!"
   },
   "nav": {
@@ -94,6 +99,9 @@
     "additionalInfo": "We recommend booking your accommodation early, as September is still peak season in Porto. If you’d like recommendations or need help with your booking, we’re more than happy to help.",
     "apartmentsContactWA": "Contact via WhatsApp",
     "apartmentsContact": "Contact"
+  },
+  "outro": {
+    "message": "We are so excited to celebrate our love with you and can't wait to see you 💓"
   },
   "footer": {
     "madeWithLove": "Made with love",
