@@ -3,7 +3,7 @@ import { useLanguage } from '../../hooks/useLanguage'
 const LANGUAGE_LABELS = {
   pt: 'PT',
   en: 'EN',
-  uk: 'UK'
+  uk: 'UA'
 }
 
 export default function LanguageSwitcher() {
