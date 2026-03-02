@@ -23,7 +23,10 @@ export default function Admin() {
   const {
     handleDelete,
     handleUpdateNotes,
-    handlePlusOneStatus
+    handlePlusOneStatus,
+    handleUpdateGuest,
+    handleAddGuest,
+    handleDeleteGuest
   } = useSubmissionActions(submissions, setSubmissions, refreshData)
 
   const handleLogout = () => {
@@ -68,6 +71,9 @@ export default function Admin() {
               onDelete={handleDeleteWithConfirm}
               onUpdateNotes={handleUpdateNotes}
               onPlusOneStatusChange={handlePlusOneStatus}
+              onUpdateGuest={handleUpdateGuest}
+              onAddGuest={handleAddGuest}
+              onDeleteGuest={handleDeleteGuest}
             />
           </>
         )}

@@ -138,21 +138,54 @@ export async function updateSubmissionNotes(id, notes) {
 export async function updatePlusOneStatus(submissionId, guestId, plusOneStatus) {
   const response = await fetch(`${API_BASE}/rsvp/${submissionId}/guest/${guestId}`, {
     method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-      ...authHeaders()
-    },
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
     body: JSON.stringify({ plusOneStatus })
   })
-
   if (!response.ok) {
-    if (response.status === 401) {
-      adminLogout()
-      throw new Error('Session expired')
-    }
+    if (response.status === 401) { adminLogout(); throw new Error('Session expired') }
     throw new Error('Failed to update plus one status')
   }
+  return response.json()
+}
 
+// Update guest name / attending
+export async function updateGuest(submissionId, guestId, fields) {
+  const response = await fetch(`${API_BASE}/rsvp/${submissionId}/guest/${guestId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify(fields)
+  })
+  if (!response.ok) {
+    if (response.status === 401) { adminLogout(); throw new Error('Session expired') }
+    throw new Error('Failed to update guest')
+  }
+  return response.json()
+}
+
+// Add a guest to a submission
+export async function addGuest(submissionId, guest) {
+  const response = await fetch(`${API_BASE}/rsvp/${submissionId}/guest`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify(guest)
+  })
+  if (!response.ok) {
+    if (response.status === 401) { adminLogout(); throw new Error('Session expired') }
+    throw new Error('Failed to add guest')
+  }
+  return response.json()
+}
+
+// Delete a guest
+export async function deleteGuest(submissionId, guestId) {
+  const response = await fetch(`${API_BASE}/rsvp/${submissionId}/guest/${guestId}`, {
+    method: 'DELETE',
+    headers: authHeaders()
+  })
+  if (!response.ok) {
+    if (response.status === 401) { adminLogout(); throw new Error('Session expired') }
+    throw new Error('Failed to delete guest')
+  }
   return response.json()
 }
 

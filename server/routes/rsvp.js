@@ -121,30 +121,85 @@ router.patch('/:id', authMiddleware, async (req, res) => {
   }
 });
 
-// Update guest plus one status (admin only)
-router.patch('/:submissionId/guest/:guestId', authMiddleware, async (req, res) => {
+// Add a guest to a submission (admin only)
+router.post('/:id/guest', authMiddleware, async (req, res) => {
   try {
-    const { submissionId, guestId } = req.params;
-    const { plusOneStatus } = req.body;
+    const { id } = req.params;
+    const { name, attending, isPlusOneRequest } = req.body;
 
-    // Validate status
-    if (!['approved', 'rejected', null].includes(plusOneStatus)) {
-      return res.status(400).json({ error: 'Invalid status. Must be "approved", "rejected", or null' });
+    if (!name || name.trim() === '') {
+      return res.status(400).json({ error: 'Guest name is required' });
+    }
+    if (typeof attending !== 'boolean') {
+      return res.status(400).json({ error: 'Attending status is required' });
     }
 
     const result = await pool.query(
-      'UPDATE guests SET plus_one_status = $1 WHERE id = $2 AND submission_id = $3',
-      [plusOneStatus, guestId, submissionId]
+      'INSERT INTO guests (submission_id, name, attending, is_plus_one_request) VALUES ($1, $2, $3, $4) RETURNING id',
+      [id, name.trim(), attending, isPlusOneRequest || false]
     );
 
-    if (result.rowCount === 0) {
-      return res.status(404).json({ error: 'Guest not found' });
+    res.status(201).json({ success: true, guestId: result.rows[0].id });
+  } catch (error) {
+    console.error('Error adding guest:', error);
+    res.status(500).json({ error: 'Failed to add guest' });
+  }
+});
+
+// Update a guest (name, attending) (admin only)
+router.patch('/:submissionId/guest/:guestId', authMiddleware, async (req, res) => {
+  try {
+    const { submissionId, guestId } = req.params;
+    const { plusOneStatus, name, attending } = req.body;
+
+    // Plus one status update
+    if (plusOneStatus !== undefined) {
+      if (!['approved', 'rejected', null].includes(plusOneStatus)) {
+        return res.status(400).json({ error: 'Invalid status. Must be "approved", "rejected", or null' });
+      }
+      const result = await pool.query(
+        'UPDATE guests SET plus_one_status = $1 WHERE id = $2 AND submission_id = $3',
+        [plusOneStatus, guestId, submissionId]
+      );
+      if (result.rowCount === 0) return res.status(404).json({ error: 'Guest not found' });
+      return res.json({ success: true });
     }
 
-    res.json({ success: true, message: 'Plus one status updated' });
+    // Name / attending update
+    const fields = [];
+    const values = [];
+    let i = 1;
+    if (name !== undefined) { fields.push(`name = $${i++}`); values.push(name.trim()); }
+    if (attending !== undefined) { fields.push(`attending = $${i++}`); values.push(attending); }
+
+    if (fields.length === 0) return res.status(400).json({ error: 'Nothing to update' });
+
+    values.push(guestId, submissionId);
+    const result = await pool.query(
+      `UPDATE guests SET ${fields.join(', ')} WHERE id = $${i++} AND submission_id = $${i}`,
+      values
+    );
+    if (result.rowCount === 0) return res.status(404).json({ error: 'Guest not found' });
+    res.json({ success: true });
   } catch (error) {
-    console.error('Error updating plus one status:', error);
-    res.status(500).json({ error: 'Failed to update plus one status' });
+    console.error('Error updating guest:', error);
+    res.status(500).json({ error: 'Failed to update guest' });
+  }
+});
+
+// Delete a guest (admin only)
+router.delete('/:submissionId/guest/:guestId', authMiddleware, async (req, res) => {
+  try {
+    const { submissionId, guestId } = req.params;
+    const result = await pool.query(
+      'DELETE FROM guests WHERE id = $1 AND submission_id = $2',
+      [guestId, submissionId]
+    );
+    if (result.rowCount === 0) return res.status(404).json({ error: 'Guest not found' });
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting guest:', error);
+    res.status(500).json({ error: 'Failed to delete guest' });
   }
 });
 

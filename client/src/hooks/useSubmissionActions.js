@@ -2,7 +2,10 @@ import { useState } from 'react'
 import {
   deleteRSVPSubmission,
   updateSubmissionNotes,
-  updatePlusOneStatus
+  updatePlusOneStatus,
+  updateGuest,
+  addGuest,
+  deleteGuest
 } from '../utils/api'
 
 export function useSubmissionActions(submissions, setSubmissions, refreshData) {
@@ -61,10 +64,54 @@ export function useSubmissionActions(submissions, setSubmissions, refreshData) {
     }
   }
 
+  const handleUpdateGuest = async (submissionId, guestId, fields) => {
+    try {
+      await updateGuest(submissionId, guestId, fields)
+      setSubmissions(submissions.map(s => {
+        if (s.id !== submissionId) return s
+        return { ...s, guests: s.guests.map(g => g.id === guestId ? { ...g, ...fields } : g) }
+      }))
+    } catch (error) {
+      console.error('Failed to update guest:', error)
+      throw error
+    }
+  }
+
+  const handleAddGuest = async (submissionId, guest) => {
+    try {
+      const { guestId } = await addGuest(submissionId, guest)
+      setSubmissions(submissions.map(s => {
+        if (s.id !== submissionId) return s
+        return { ...s, guests: [...s.guests, { id: guestId, ...guest }] }
+      }))
+      refreshData()
+    } catch (error) {
+      console.error('Failed to add guest:', error)
+      throw error
+    }
+  }
+
+  const handleDeleteGuest = async (submissionId, guestId) => {
+    try {
+      await deleteGuest(submissionId, guestId)
+      setSubmissions(submissions.map(s => {
+        if (s.id !== submissionId) return s
+        return { ...s, guests: s.guests.filter(g => g.id !== guestId) }
+      }))
+      refreshData()
+    } catch (error) {
+      console.error('Failed to delete guest:', error)
+      throw error
+    }
+  }
+
   return {
     handleDelete,
     handleUpdateNotes,
     handlePlusOneStatus,
+    handleUpdateGuest,
+    handleAddGuest,
+    handleDeleteGuest,
     actionLoading
   }
 }

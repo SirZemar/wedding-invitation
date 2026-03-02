@@ -6,7 +6,10 @@ export default function SubmissionsList({
   submissions,
   onDelete,
   onUpdateNotes,
-  onPlusOneStatusChange
+  onPlusOneStatusChange,
+  onUpdateGuest,
+  onAddGuest,
+  onDeleteGuest
 }) {
   const { t } = useLanguage()
 
@@ -43,6 +46,9 @@ export default function SubmissionsList({
               onDelete={onDelete}
               onUpdateNotes={onUpdateNotes}
               onPlusOneStatusChange={onPlusOneStatusChange}
+              onUpdateGuest={onUpdateGuest}
+              onAddGuest={onAddGuest}
+              onDeleteGuest={onDeleteGuest}
             />
           ))}
         </div>

@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { useLanguage } from '../../hooks/useLanguage'
 import GuestList from './GuestList'
 import NotesEditor from './NotesEditor'
@@ -7,10 +6,12 @@ export default function SubmissionCard({
   submission,
   onDelete,
   onUpdateNotes,
-  onPlusOneStatusChange
+  onPlusOneStatusChange,
+  onUpdateGuest,
+  onAddGuest,
+  onDeleteGuest
 }) {
   const { t } = useLanguage()
-  const [isExpanded, setIsExpanded] = useState(false)
 
   const formatDate = (dateStr) => {
     return new Date(dateStr).toLocaleString()
@@ -36,33 +37,19 @@ export default function SubmissionCard({
         </button>
       </div>
 
-      {/* Guests Summary/List */}
+      {/* Guests List */}
       <div className="mb-3">
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="font-medium hover:text-accent flex items-center gap-2 w-full text-left"
-        >
-          <span>
-            {submission.guests.length} {t('admin.guests').toLowerCase()}
-            {submission.guests.length !== 1 ? '' : ''}
-          </span>
-          <svg
-            className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
-
-        {isExpanded && (
-          <GuestList
-            guests={submission.guests}
-            submissionId={submission.id}
-            onPlusOneStatusChange={onPlusOneStatusChange}
-          />
-        )}
+        <span className="font-medium">
+          {submission.guests.length} {t('admin.guests').toLowerCase()}
+        </span>
+        <GuestList
+          guests={submission.guests}
+          submissionId={submission.id}
+          onPlusOneStatusChange={onPlusOneStatusChange}
+          onUpdateGuest={onUpdateGuest}
+          onAddGuest={onAddGuest}
+          onDeleteGuest={onDeleteGuest}
+        />
       </div>
 
       {/* Notes */}
